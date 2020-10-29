@@ -70,7 +70,7 @@ function update_team() {
   # 親チームが設定されている場合はエラーメッセージを表示して処理を中断する
   local res=`curl -sS -H "$CUSTOMHEADER" -H "Authorization: token $TOKEN" -w "%{http_code}" "$ENDPOINT/orgs/$ORG/teams/$child_team"`
   local http_status=`echo $res | tail -c 4`
-  local has_parent=`echo ${res::-4} | jq '.parent'`
+  local has_parent=`echo ${res::${#res}-4} | jq '.parent'`
 
   if [[ "$http_status" != "200" ]]; then
     echo "ERROR: $child_team not found."
@@ -86,7 +86,7 @@ function update_team() {
   # 親チームのIDを取得する
   local res=`curl -sS -H "$CUSTOMHEADER" -H "Authorization: token $TOKEN" -w "%{http_code}" "$ENDPOINT/orgs/$ORG/teams/$PARENT_TEAM"`
   local http_status=`echo $res | tail -c 4`
-  local parent_team_id=`echo ${res::-4} | jq '.id'`
+  local parent_team_id=`echo ${res::${#res}-4} | jq '.id'`
 
   if [[ "$http_status" != "200" ]]; then
     echo "ERROR: $PARENT_TEAM not found."
@@ -96,7 +96,7 @@ function update_team() {
   # 子チームに親チームを設定する
   local res=`curl -sS -X PATCH -H "$CUSTOMHEADER" -H "Authorization: token $TOKEN" -w "%{http_code}" "$ENDPOINT/orgs/$ORG/teams/$child_team" -d "{\"parent_team_id\":$parent_team_id}"`
   local http_status=`echo $res | tail -c 4`
-  local parent=`echo ${res::-4} | jq '.parent'`
+  local parent=`echo ${res::${#res}-4} | jq '.parent'`
 
   if [[ "$http_status" != "200" ]]; then
     echo "ERROR: $PARENT_TEAM not found."
