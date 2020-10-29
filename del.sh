@@ -13,6 +13,15 @@ function pre_process() {
   success_teams=()
   failure_teams=()
 
+  # Empty check
+  if [[ $PARENT_TEAM == "" ]]; then
+    echo "ERROR: PARENT_TEAM is empty, exit."
+    exit 1
+  elif [[ $CHILD_TEAMS == "" ]]; then
+    echo "ERROR: CHILD_TEAMS is empty, exit."
+    exit 1
+  fi
+
   # Validate child_team
   validated_child_teams=()
   while read -a line; do
@@ -22,7 +31,7 @@ function pre_process() {
     fi
 
     team_name=`echo $(IFS=","; echo "${line[*]}") | sed -e "s/,/ /g"`
-    
+
     exit_code=0
     validate_team "$team_name" || exit_code=$?
     if [[ $exit_code != 1 ]]; then
