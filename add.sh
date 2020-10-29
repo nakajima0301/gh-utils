@@ -71,6 +71,7 @@ function update_team() {
   local res=`curl -sS -H "$CUSTOMHEADER" -H "Authorization: token $TOKEN" -w "%{http_code}" "$ENDPOINT/orgs/$ORG/teams/$child_team"`
   local http_status=`echo $res | tail -c 4`
   local has_parent=`echo ${res::${#res}-4} | jq '.parent'`
+  local child_team_id=`echo ${res::${#res}-4} | jq '.id'`
 
   if [[ "$http_status" != "200" ]]; then
     echo "ERROR: $child_team not found."
@@ -88,6 +89,11 @@ function update_team() {
   local http_status=`echo $res | tail -c 4`
   local parent_team_id=`echo ${res::${#res}-4} | jq '.id'`
 
+  if [[ "$parent_team_id" == "$child_team_id" ]]; then
+    echo "ERROR: The parent and child teams refer to the same team."
+    return 1
+  fi
+
   if [[ "$http_status" != "200" ]]; then
     echo "ERROR: $PARENT_TEAM not found."
     return 1
@@ -97,11 +103,6 @@ function update_team() {
   local res=`curl -sS -X PATCH -H "$CUSTOMHEADER" -H "Authorization: token $TOKEN" -w "%{http_code}" "$ENDPOINT/orgs/$ORG/teams/$child_team" -d "{\"parent_team_id\":$parent_team_id}"`
   local http_status=`echo $res | tail -c 4`
   local parent=`echo ${res::${#res}-4} | jq '.parent'`
-
-  if [[ "$http_status" != "200" ]]; then
-    echo "ERROR: $PARENT_TEAM not found."
-    return 1
-  fi
 
   echo $parent
 }

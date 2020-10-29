@@ -2,9 +2,11 @@
 
 export ORG="knapitestorg"
 export PARENT_TEAM="Team1"
-export CHILD_TEAM="Team4"
 export CHILD_TEAMS="
+Team2
+Team3
 Team4
+Team5
 "
 # TOKEN -> .bashrc
 
