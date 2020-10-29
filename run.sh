@@ -3,6 +3,9 @@
 export ORG="knapitestorg"
 export PARENT_TEAM="Team1"
 export CHILD_TEAM="Team4"
+export CHILD_TEAMS="
+Team4
+"
 # TOKEN -> .bashrc
 
 function usage() {
