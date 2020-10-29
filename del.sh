@@ -14,10 +14,7 @@ function pre_process() {
   failure_teams=()
 
   # Empty check
-  if [[ $PARENT_TEAM == "" ]]; then
-    echo "ERROR: PARENT_TEAM is empty, exit."
-    exit 1
-  elif [[ $CHILD_TEAMS == "" ]]; then
+  if [[ $CHILD_TEAMS == "" ]]; then
     echo "ERROR: CHILD_TEAMS is empty, exit."
     exit 1
   fi
