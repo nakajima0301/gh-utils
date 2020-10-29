@@ -1,13 +1,8 @@
 #!/bin/bash
 
 export ORG="knapitestorg"
-export PARENT_TEAM="Team1"
-export CHILD_TEAMS="
-Team2
-Team3
-Team4
-Team5
-"
+export PARENT_TEAM=""
+export CHILD_TEAMS=""
 # TOKEN -> .bashrc
 
 function usage() {

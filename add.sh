@@ -14,6 +14,15 @@ function pre_process() {
   success_teams=()
   failure_teams=()
 
+  # Empty check
+  if [[ $PARENT_TEAM == "" ]]; then
+    echo "ERROR: PARENT_TEAM is empty, exit."
+    exit 1
+  elif [[ $CHILD_TEAMS == "" ]]; then
+    echo "ERROR: CHILD_TEAMS is empty, exit."
+    exit 1
+  fi
+
   # Validate parent_team
   IFS_BUCKUP=$IFS_BACKUP
   IFS=$(echo -en "\n\t")
@@ -28,7 +37,7 @@ function pre_process() {
 
   IFS=$IFS_BACKUP
 
-   # Validate child_team
+  # Validate child_team
   validated_child_teams=()
   while read -a line; do
     # 空白行をスキップ
@@ -48,6 +57,8 @@ function pre_process() {
       failure_teams+=("$team_name")
     fi
   done < <(echo "$CHILD_TEAMS")
+
+  fetch_parent_team_id
 }
 
 function validate_team() {
@@ -59,6 +70,18 @@ function validate_team() {
     if [[ ${BASH_REMATCH[0]} != $team_name ]]; then
       return 1
     fi
+  fi
+}
+
+function fetch_parent_team_id() {
+  # 親チームのIDを取得する
+  local res=`curl -sS -H "$CUSTOMHEADER" -H "Authorization: token $TOKEN" -w "%{http_code}" "$ENDPOINT/orgs/$ORG/teams/$PARENT_TEAM"`
+  local http_status=`echo $res | tail -c 4`
+  parent_team_id=`echo ${res::${#res}-4} | jq '.id'`
+
+  if [[ "$http_status" != "200" ]]; then
+    echo "ERROR: Parent team not found, exit."
+    exit 1
   fi
 }
 
@@ -84,18 +107,8 @@ function update_team() {
     return 1
   fi
 
-  # 親チームのIDを取得する
-  local res=`curl -sS -H "$CUSTOMHEADER" -H "Authorization: token $TOKEN" -w "%{http_code}" "$ENDPOINT/orgs/$ORG/teams/$PARENT_TEAM"`
-  local http_status=`echo $res | tail -c 4`
-  local parent_team_id=`echo ${res::${#res}-4} | jq '.id'`
-
   if [[ "$parent_team_id" == "$child_team_id" ]]; then
     echo "ERROR: The parent and child teams refer to the same team."
-    return 1
-  fi
-
-  if [[ "$http_status" != "200" ]]; then
-    echo "ERROR: $PARENT_TEAM not found."
     return 1
   fi
 
