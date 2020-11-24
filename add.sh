@@ -87,7 +87,6 @@ function fetch_parent_team_id() {
 
 function update_team() {
   local child_team=$1
-  echo "-> $child_team"
 
   # 子チームに親チームが設定されているかチェック
   # 親チームが設定されている場合はエラーメッセージを表示して処理を中断する
@@ -102,9 +101,10 @@ function update_team() {
   fi
 
   if [[ "$has_parent" != "null" ]]; then
-    echo "ERROR: $child_team already has a parent team."
-    echo "If you want to change the parent team, please run the delete parent team job first."
-    return 1
+    echo $has_parent | jq -r '.name'
+    echo "ERROR: $child_team already has a parent team." 1>&2
+    echo "If you want to change the parent team, please run the delete parent team job first." 1>&2
+    return 2
   fi
 
   if [[ "$parent_team_id" == "$child_team_id" ]]; then
@@ -148,9 +148,12 @@ function main() {
 
   for team_name in ${validated_child_teams[@]}; do
     exit_code=0
-    update_team $team_name || exit_code=$?
+    echo "> $team_name"
+    has_parent_team_name=`update_team $team_name` || exit_code=$?
     if [[ "$exit_code" == 1 ]]; then
       failure_teams+=("$team_name")
+    elif [[ "$exit_code" == 2 ]]; then
+      failure_teams+=("$team_name | Parent : $has_parent_team_name")
     else
       success_teams+=("$team_name")
     fi
