@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export ORG="knapitestorg"
-export TEAM="Team1"
+export TEAM="Parent"
 # TOKEN -> .bashrc
 
 function usage() {
