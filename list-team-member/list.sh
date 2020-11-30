@@ -78,7 +78,13 @@ function list_team() {
 
 function main() {
   pre_process
-  list_team $TEAM
+
+  exit_code=0
+  list_team $TEAM || exit_code=$?
+  echo ""
+  if [[ "$exit_code" == 1 ]]; then
+    exit
+  fi
 }
 
 main

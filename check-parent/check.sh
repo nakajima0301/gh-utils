@@ -58,7 +58,13 @@ function check_parent() {
 
 function main() {
   pre_process
-  check_parent $TEAM
+
+  exit_code=0
+  check_parent $TEAM || exit_code=$?
+  echo ""
+  if [[ "$exit_code" == 1 ]]; then
+    exit
+  fi
 }
 
 main
