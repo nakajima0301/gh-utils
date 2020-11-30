@@ -63,7 +63,7 @@ function main() {
   check_parent $TEAM || exit_code=$?
   echo ""
   if [[ "$exit_code" == 1 ]]; then
-    exit
+    exit 1
   fi
 }
 
